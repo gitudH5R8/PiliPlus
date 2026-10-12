@@ -225,7 +225,37 @@ class VideoCardV extends StatelessWidget {
   static final shortFormat = DateFormat('M-d');
   static final longFormat = DateFormat('yy-M-d');
 
+  String get pubdateText {
+    if (videoItem is RcmdVideoItemModel) {
+      return DateFormatUtils.dateFormat(
+        videoItem.pubdate,
+        short: shortFormat,
+        long: longFormat,
+      );
+    }
+
+    if (videoItem is RcmdVideoItemAppModel) {
+      final desc = videoItem.desc;
+      if (desc != null && desc.contains(' · ')) {
+        final date = desc.split(' · ').last;
+        if (date.contains('年')) {
+          return RegExp(r'\d+')
+              .allMatches(date)
+              .map((match) {
+                final value = match.group(0)!;
+                return value.length == 4 ? value.substring(2) : value;
+              })
+              .join('-');
+        }
+        return date;
+      }
+    }
+
+    return '';
+  }
+
   Widget videoStat(ThemeData theme) {
+    final pubdate = pubdateText;
     return Row(
       children: [
         StatWidget(
@@ -239,7 +269,7 @@ class VideoCardV extends StatelessWidget {
             value: videoItem.stat.danmu,
           ),
         ],
-        if (videoItem is RcmdVideoItemModel) ...[
+        if (pubdate.isNotEmpty) ...[
           const Spacer(),
           Text.rich(
             maxLines: 1,
@@ -248,11 +278,7 @@ class VideoCardV extends StatelessWidget {
                 fontSize: theme.textTheme.labelSmall!.fontSize,
                 color: theme.colorScheme.outline.withValues(alpha: 0.8),
               ),
-              text: DateFormatUtils.dateFormat(
-                videoItem.pubdate,
-                short: shortFormat,
-                long: longFormat,
-              ),
+              text: pubdate,
             ),
           ),
           const SizedBox(width: 2),
