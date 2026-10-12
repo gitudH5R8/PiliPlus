@@ -115,7 +115,7 @@ abstract final class VideoHttp {
     required int freshIdx,
   }) async {
     final params = {
-      'build': 8430300,
+      'build': 1462100,
       'c_locale': 'zh_CN',
       'channel': 'master',
       'column': 2,
